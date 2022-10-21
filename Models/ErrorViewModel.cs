@@ -1,6 +1,4 @@
-using System;
-
-namespace SDT.Models
+namespace SDT.Web.Models
 {
     public class ErrorViewModel
     {

@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using SDT.Data.Repository.Projects;
+using SDT.Services.Contracts.Domains.Projects;
+using SDT.Services.Contracts.Domains.TestDomain;
+using SDT.Services.Domains.Projects;
+using SDT.Services.Domains.TestDomain;
 
-namespace SDT
+namespace SDT.Web
 {
     public class Startup
     {
@@ -24,6 +24,11 @@ namespace SDT
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+
+            services.AddTransient<ITestService, TestService>();
+            services.AddTransient<IProjectService, ProjectService>();
+
+            services.AddTransient<IProjectRepository, ProjectRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
