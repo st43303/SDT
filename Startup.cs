@@ -1,13 +1,17 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SDT.Data.Repository.Projects;
+using SDT.Data.Repository.User;
 using SDT.Services.Contracts.Domains.Projects;
 using SDT.Services.Contracts.Domains.TestDomain;
+using SDT.Services.Contracts.Domains.User;
 using SDT.Services.Domains.Projects;
 using SDT.Services.Domains.TestDomain;
+using SDT.Services.Domains.User;
 
 namespace SDT.Web
 {
@@ -23,12 +27,22 @@ namespace SDT.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options => 
+                {
+                    options.LoginPath = "/Account/Login";
+                    options.AccessDeniedPath = "/Account/Login";
+                });
+
             services.AddControllersWithViews();
+            services.AddRazorPages();
 
             services.AddTransient<ITestService, TestService>();
             services.AddTransient<IProjectService, ProjectService>();
+            services.AddTransient<IUserService, UserService>();
 
             services.AddTransient<IProjectRepository, ProjectRepository>();
+            services.AddTransient<IUserRepository, UserRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,6 +63,7 @@ namespace SDT.Web
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
@@ -56,6 +71,7 @@ namespace SDT.Web
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
             });
         }
     }

@@ -1,15 +1,19 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SDT.Services.Contracts.Domains.Projects;
+using SDT.Web.Extensions;
 using SDT.Web.Models;
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SDT.Web.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> logger;
@@ -23,8 +27,9 @@ namespace SDT.Web.Controllers
 
         public async Task<IActionResult> Index(CancellationToken ct)
         {
-           
-            var projects = await projectService.GetUserProjectsAsync(1, ct);
+            var userId = User.GetUserId() ?? 0;
+
+            var projects = await projectService.GetUserProjectsAsync(userId, ct);
 
             var projectViews = projects.Select(project => new ProjectViewModel
             {
@@ -35,7 +40,7 @@ namespace SDT.Web.Controllers
                 Id = project.Id,
                 Name = project.Name,
                 WIP = project.WIP
-            });
+            }).ToList();
 
             return View(projectViews);
         }
